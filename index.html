@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine's Proposal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="shortcut icon" href="assets/flaticon.png" type="image/x-icon"> <!-- Make sure you have this asset -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        /* --- Base & Existing Styles --- */
+        body {
+            position: relative; /* Needed for absolute/fixed positioning context */
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        .heart-beat {
+            animation: heartbeat 1.5s ease infinite;
+        }
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .fade-in {
+            animation: fadeIn 1.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        /* Updated "No" Button Transition */
+        .moving-no {
+             /* Position set dynamically */
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out, left 0.3s ease-out, top 0.3s ease-out;
+        }
+        .love-letter {
+            background: url('https://www.transparenttextures.com/patterns/cream-paper.png'); /* Example texture */
+            transform: rotate(-2deg);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .envelope {
+            background: url('https://www.transparenttextures.com/patterns/rice-paper-2.png'); /* Example texture */
+            transform: rotate(2deg);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .memory-card {
+            transition: all 0.3s ease;
+        }
+        .memory-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        .polaroid {
+            background: white;
+            padding: 15px 15px 60px 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: rotate(1deg);
+        }
+        .polaroid:nth-child(even) {
+            transform: rotate(-1deg);
+        }
+        .polaroid:before {
+            content: '';
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
+            height: 30px;
+            background: rgba(0,0,0,0.1);
+            filter: blur(5px);
+        }
+        .countdown-number {
+            font-family: 'Courier New', monospace;
+        }
+        .typewriter {
+            overflow: hidden;
+            border-right: .15em solid pink;
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: .15em;
+            animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+        }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: pink; }
+        }
+        .copy-btn {
+            position: relative;
+        }
+        .copy-btn:after {
+            content: 'Copied!';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none; /* Prevent hover */
+        }
+        .copy-btn.copied:after {
+            opacity: 1;
+        }
+        .gif-container {
+            max-width: 300px;
+            margin: 0 auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .reaction-btn {
+            transition: all 0.3s ease;
+        }
+        .reaction-btn:hover {
+            transform: scale(1.1);
+        }
+        /* Updated Love Meter Style */
+        .love-meter-wrapper {
+            position: relative; /* Container for positioning text */
+            width: 100%;
+            height: 20px;
+            background-color: #fde8e8; /* Background of the meter track */
+            border-radius: 10px;
+            overflow: hidden; /* Keep inner bar contained */
+            margin: 0 auto; /* Centering if needed */
+            max-width: max-content; /* Adjust as needed, e.g., max-w-lg */
+        }
+        .love-meter {
+            height: 100%; /* Fill the wrapper height */
+            border-radius: 10px;
+            background: linear-gradient(to right, #ff6b6b, #ff8e8e, #ffb3b3);
+            transition: width 0.8s ease-in-out;
+            position: relative; /* Needed for z-index if text overlaps */
+            width: 0%; /* Start at 0 */
+        }
+        #loveMeterText {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white; /* Text color */
+            font-size: 0.75rem; /* Adjust size as needed */
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3); /* Add shadow for readability */
+            opacity: 0; /* Start hidden */
+            transition: opacity 0.5s ease 0.7s; /* Fade in after bar starts filling */
+            z-index: 2; /* Ensure text is above the bar */
+            white-space: nowrap; /* Prevent text wrapping */
+        }
+        /* --- End Love Meter Styles --- */
+        .kiss-animation {
+            animation: kiss 2s ease infinite;
+        }
+        @keyframes kiss {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        .love-note {
+            background: #fff9f9;
+            border-left: 4px solid #ff6b6b;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .memory-scrapbook {
+            background: #fff5f5; /* Solid color for memory scrapbook */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        .cute-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            z-index: 1000; /* High z-index */
+            max-width: 300px;
+            text-align: center;
+            animation: popIn 0.3s ease-out;
+        }
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999; /* Below popup */
+        }
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #ff6b6b;
+        }
+        .popup-content {
+            margin: 15px 0;
+        }
+        .popup-gif {
+            max-width: 150px;
+            margin: 0 auto 15px;
+            border-radius: 10px;
+        }
+
+        /* --- Background Animation Styles --- */
+        #background-animations {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .balloon {
+            position: absolute;
+            bottom: -150px;
+            width: 60px;
+            height: 75px;
+            background-color: rgba(255, 107, 107, 0.8);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            animation: floatUp 15s infinite linear;
+            opacity: 0.8;
+        }
+        .balloon::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 20px;
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) translateX(0) rotate(0deg); bottom: -150px; }
+            50% { transform: translateY(-50vh) translateX(30px) rotate(15deg); }
+            100% { transform: translateY(-120vh) translateX(-10px) rotate(-5deg); bottom: 120vh; }
+        }
+        .splash-card {
+            position: absolute;
+            font-size: 2rem;
+            color: #ff6b6b;
+            animation: splash 1s ease-out forwards;
+            opacity: 0;
+            pointer-events: none;
+        }
+        @keyframes splash {
+            0% { transform: scale(0.5) rotate(0deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(15deg); opacity: 1; }
+            100% { transform: scale(1) rotate(-5deg); opacity: 0; }
+        }
+
+        /* --- Custom Audio Player Styles --- */
+        #valentineSong {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 0; height: 0; display: block;
+            position: absolute; opacity: 0; pointer-events: none;
+        }
+        .custom-audio-controls {
+            display: flex; align-items: center; justify-content: center;
+            gap: 1rem; width: 100%; margin-top: 0.5rem;
+        }
+        .play-pause-btn {
+            background-color: #ff6b6b; color: white; border: none;
+            border-radius: 50%; width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: background-color 0.2s ease; flex-shrink: 0;
+        }
+        .play-pause-btn:hover { background-color: #ff4757; }
+        .play-pause-btn svg { width: 20px; height: 20px; fill: currentColor; }
+        .progress-bar-container {
+            flex-grow: 1; height: 8px; background-color: #fde8e8;
+            border-radius: 4px; cursor: pointer; overflow: hidden;
+        }
+        .progress-bar {
+            width: 0%; height: 100%; background-color: #ff6b6b;
+            border-radius: 4px; transition: width 0.1s linear;
+        }
+
+    </style>
+</head>
+<body class="bg-pink-50 min-h-screen flex flex-col items-center justify-center p-4 font-sans overflow-x-hidden relative">
+    <!-- Background Animation Container -->
+    <div id="background-animations">
+        <div id="balloon-container"></div>
+        <div id="splash-card-container"></div>
+    </div>
+
+    <!-- Name Input Step -->
+    <div id="nameInputStep" class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center fade-in z-10 relative">
+        <div class="floating mb-6">
+            <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDAyd2U3ZGE3NHl1cnN2cXEzOXZ0cWhnaTRtMnlicmNkbWx3a3hvOCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/DorxfW5xBGSG8bVxRa/giphy.gif" alt="Floating hearts" class="h-24 w-24 mx-auto">
+        </div>
+        <h1 class="text-3xl font-bold text-pink-600 mb-6">Create Your Valentine's Proposal</h1>
+        <div class="space-y-4 mb-6">
+            <div class="text-left">
+                <label for="senderName" class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                <input type="text" id="senderName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500" placeholder="Enter your name">
+            </div>
+            <div class="text-left">
+                <label for="recipientName" class="block text-sm font-medium text-gray-700 mb-1">Your Valentine's Name</label>
+                <input type="text" id="recipientName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500" placeholder="Enter their name">
+            </div>
+            <div class="text-left">
+                <label for="relationshipLength" class="block text-sm font-medium text-gray-700 mb-1">How long have you been together?</label>
+                <select id="relationshipLength" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500">
+                    <option value="new">Just met recently</option>
+                    <option value="months">A few months</option>
+                    <option value="year" selected>About a year</option>
+                    <option value="years">Several years</option>
+                    <option value="forever">Forever and always</option>
+                </select>
+            </div>
+        </div>
+        <button onclick="generateProposalLink()" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 w-full flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" /></svg>
+            Create Proposal
+        </button>
+    </div>
+
+    <!-- Link Generation Step -->
+    <div id="linkStep" class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center hidden z-10 relative">
+        <div class="floating mb-6">
+            <img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNndscW1pMmRmeHlxNHdkMmdnMmQ0ZnlpOWV0bHlmd2dnejl2dnk5MCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/si4P9VBMEIhq40i6tT/giphy.gif" alt="Excited GIF" class="h-24 w-24 mx-auto rounded-full">
+        </div>
+        <h1 class="text-2xl font-bold text-pink-600 mb-4">Your Proposal Link is Ready!</h1>
+        <p class="text-gray-600 mb-4">Send this link to <span id="displayRecipientName" class="font-bold text-pink-600"></span>:</p>
+        <div class="bg-pink-50 p-3 rounded-lg mb-6 flex items-center">
+            <input type="text" id="proposalLink" class="flex-grow px-3 py-2 bg-transparent border-none focus:outline-none" readonly>
+            <button onclick="copyLink()" class="copy-btn bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
+                Copy
+            </button>
+        </div>
+        <div class="mb-4">
+            <p class="text-sm text-gray-500">Or share directly:</p>
+            <div class="flex justify-center space-x-2 mt-2">
+                <button onclick="shareOnWhatsApp()" class="bg-green-500 text-white p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-6.29-3.588c.245.098 1.617.867 1.99.967.372.099.62.05.744-.148.124-.198.42-.645.62-.843.198-.198.397-.223.694-.074.297.15 1.214.594 1.983 1.364.717.718 1.192 1.538 1.34 1.802.149.248.124.372-.074.57-.198.198-.372.223-.694.074-.322-.149-1.364-.496-2.334-1.588-.744-.842-1.24-1.885-1.364-2.235-.124-.347-.012-.533.174-.678.174-.133.397-.347.546-.496.149-.149.223-.248.347-.496.124-.248.062-.372-.037-.471-.099-.099-.198-.186-.347-.248-.149-.062-.372-.111-.546-.111-.198 0-.372.025-.545.074"/></svg></button>
+                <button onclick="shareOnFacebook()" class="bg-blue-500 text-white p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.04c-5.5 0-10 4.49-10 10.02 0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.23.19 2.23.19v2.47h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.53-4.5-10.02-10-10.02z"/></svg></button>
+                <button onclick="shareOnTwitter()" class="bg-blue-400 text-white p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/></svg></button>
+            </div>
+        </div>
+        <button onclick="startProposal()" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 w-full flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
+            Preview Proposal
+        </button>
+    </div>
+
+    <!-- Initial Step -->
+    <div id="step1" class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center hidden z-10 relative">
+         <div class="floating mb-6">
+            <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExMTJ1ZGd5NG1nYWhueXJ6N3B0cWZhN2l4NHRscGpiZnZmN2Mxa2dqMSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/13Cmju3maIjStW/giphy.gif" alt="Nervous GIF" class="h-32 w-32 mx-auto rounded-full">
+        </div>
+        <h1 class="text-3xl font-bold text-pink-600 mb-6 animate__animated animate__pulse animate__infinite"><span id="proposalSenderName"></span> asks: Will You Be My Valentine?</h1>
+        <div class="flex justify-center space-x-4 relative"> <!-- Added relative positioning to container -->
+            <button onclick="showStep2()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                Yes
+            </button>
+            <!-- No button needs specific styling for movement -->
+            <button id="noButton" style="position: relative;" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-full moving-no flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                No
+            </button>
+        </div>
+        <div class="mt-6">
+            <p class="text-sm text-gray-500">How do you feel about this proposal?</p>
+            <div class="flex justify-center space-x-2 mt-2">
+                <button onclick="showReaction('blush')" class="reaction-btn"><img src="https://media.giphy.com/media/klmpEcFgXzrYQ/giphy.gif?cid=ecf05e470eiaxm7xhh0c6rtaa88xoedfrfbmh1qlzgxdo2xy&ep=v1_gifs_related&rid=giphy.gif&ct=g" alt="Blush" class="h-10 w-10 rounded-full"></button>
+                <button onclick="showReaction('excited')" class="reaction-btn"><img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExaXo1dHY4cjA0aWIzbnB1N3lrYnpmazIxNHprMjlhd3B0NWd6NTdwdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/G1W0LQ2SU6PWiA3Qee/giphy.gif" alt="Excited" class="h-10 w-10 rounded-full"></button>
+                <button onclick="showReaction('nervous')" class="reaction-btn"><img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExc2NxeGc5emF2c250N2hpb2NwYmFwbnV6aTFoeHlqMzd0YWltbmI1eiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/F6PFPjc3K0CPe/giphy.gif" alt="Nervous" class="h-10 w-10 rounded-full"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yes Response - Step 2 -->
+    <div id="step2" class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center hidden z-10 relative">
+         <div class="floating mb-6">
+            <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExNWxxb3g4c2k3bDR1bjBkbTQ0aHA5MzhoN3VlZ2wxYTA3Njk4aThtYSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3oEjI4sFlp73fvEYgw/giphy.gif" alt="Happy GIF" class="h-32 w-32 mx-auto rounded-full">
+        </div>
+        <h1 class="text-3xl font-bold text-pink-600 mb-4 animate__animated animate__bounceIn">I'm so happy you said yes, <span id="recipientNameDisplay"></span>!</h1>
+        <p class="text-gray-600 mb-6">You've made <span id="senderNameDisplay"></span> the happiest person in the world!</p>
+        <div class="gif-container mb-6">
+            <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDhlazhtcTNlZHJ6Znp2bWJlZGZsaW9icWlkNnNiazU2aHJzYW84ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3ogwGa7mmuUPDmDRle/giphy.gif" alt="Celebration" class="w-full rounded-lg">
+        </div>
+        <div class="flex justify-center">
+            <button onclick="showStep3()" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                Continue to your surprise
+            </button>
+        </div>
+    </div>
+
+    <!-- Love Letter Step -->
+    <div id="step3" class="max-w-md w-full hidden z-10 relative">
+        <div class="relative mb-8">
+            <div class="envelope p-6 rounded-lg max-w-md mx-auto cursor-pointer" onclick="openLetter()">
+                <div class="flex items-center justify-center mb-2"><img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2J0bzkzMWZiaW1mejdxNDE4OWRjbXZ6Mm5rNmoyNDVpcXB0eHJoeiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/i1ifSvtaxp4YSWX4o4/giphy.gif" alt="Heart" class="h-12 w-12"></div>
+                <h2 class="text-xl font-bold text-pink-700 mb-2">To My Valentine, <span id="letterRecipientName"></span></h2>
+                <p class="text-gray-600">Click to open your letter</p>
+            </div>
+            <div id="letterContent" class="love-letter p-6 rounded-lg max-w-md mx-auto hidden absolute top-0 left-0 right-0 z-20">
+                <h2 class="text-2xl font-bold text-pink-700 mb-4">My Dearest <span id="letterContentRecipientName"></span>,</h2>
+                <p class="text-gray-700 mb-3">From the moment we met, my life has been filled with joy and laughter.</p>
+                <p class="text-gray-700 mb-3">Your smile brightens my darkest days, and your love gives me strength.</p>
+                <p class="text-gray-700 mb-3">On this special day, I want to remind you how much you mean to me.</p>
+                <p class="text-gray-700 mb-4">You are my everything.</p>
+                <div class="flex justify-center mb-4"><img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExa2x1cnN1YmdtMDUzaTY5ancwdmsyMHVoa2FzbmplZTRmaTF0Y2J3eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/vzvnFJV8a7zipTTuHf/giphy.gif" alt="Love" class="h-16 w-16"></div>
+                <p class="text-right font-bold text-pink-600">Forever yours,</p>
+                <p class="text-right font-bold text-pink-600" id="letterSenderName"></p>
+                <button onclick="showStep4()" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-full transition duration-300 transform hover:scale-105 flex items-center mx-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    Continue
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Memory Lane Step -->
+    <div id="step4" class="max-w-3xl w-full hidden z-10 relative">
+         <h1 class="text-3xl font-bold text-pink-600 mb-8 text-center">Our Journey Together</h1>
+        <div class="memory-scrapbook mb-6 bg-white/80 backdrop-blur-sm"> <!-- Slightly transparent -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="memory-card bg-white p-4 rounded-lg shadow-md"><div class="polaroid relative"><div class="w-full h-48 bg-pink-100 flex items-center justify-center"><img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExeWc2dmI3bmV1ZXBvbHhiOTFwNG96M2VsOGd4YThxOWZkeXFyNXY0aiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/OQTGgYuLTl2a5Vn7D6/giphy.gif" alt="First Date" class="h-full w-full object-cover"></div><p class="mt-2 text-center">Our first date</p></div></div>
+                <div class="memory-card bg-white p-4 rounded-lg shadow-md"><div class="polaroid relative"><div class="w-full h-48 bg-pink-100 flex items-center justify-center"><img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWlkNTlhN2gybnEzNjJrazRjbGlnb3NucDc3YWRkNDVvY2VrbWpycSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/mcJohbfGPATW8/giphy.gif" alt="Birthday" class="h-full w-full object-cover"></div><p class="mt-2 text-center">Your birthday celebration</p></div></div>
+                <div class="memory-card bg-white p-4 rounded-lg shadow-md"><div class="polaroid relative"><div class="w-full h-48 bg-pink-100 flex items-center justify-center"><img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExaG9hMnBtbDJxcnl3Nm9oZGVhZzU2cjJteTR4em1jZ3FhZTlvNzI2MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/6XBEoFoyTuETurKuoj/giphy.gif" alt="Vacation" class="h-full w-full object-cover"></div><p class="mt-2 text-center">Summer vacation</p></div></div>
+                <div class="memory-card bg-white p-4 rounded-lg shadow-md"><div class="polaroid relative"><div class="w-full h-48 bg-pink-100 flex items-center justify-center"><img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExejloeDhyZzdobWhlN2ZjbzNpMXRra2JyY3IxOWtqaWc5ODhqZDlieiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/iggzkYV8RLgXoPdiF4/giphy.gif" alt="Christmas" class="h-full w-full object-cover"></div><p class="mt-2 text-center">Christmas together</p></div></div>
+            </div>
+        </div>
+        <!-- Updated Love Meter Section -->
+        <div class="love-meter-container mb-6 bg-white/80 backdrop-blur-sm p-4 rounded-lg">
+            <p class="text-sm text-gray-600 mb-2 text-center">Our love meter:</p>
+            <div class="love-meter-wrapper max-w-lg mx-auto"> <!-- Added wrapper and centering -->
+                <div id="loveMeter" class="love-meter"> <!-- Inner bar -->
+                     <span id="loveMeterText" class="love-meter-text"></span> <!-- Text inside the bar -->
+                </div>
+            </div>
+        </div>
+        <!-- End Love Meter Section -->
+        <div class="mt-8 text-center">
+            <button onclick="showStep5()" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 flex items-center mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                Continue to your gift
+            </button>
+        </div>
+    </div>
+
+    <!-- Countdown to Date Step -->
+    <div id="step5" class="max-w-md w-full bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 text-center hidden z-10 relative"> <!-- Slightly transparent -->
+        <h1 class="text-3xl font-bold text-pink-600 mb-6">Our Special Valentine's Date</h1>
+        <div class="mb-8">
+            <p class="text-gray-600 mb-4"><span id="dateSenderName"></span> has planned something very special for you...</p>
+            <div class="typewriter text-xl font-bold text-pink-700 mb-6">A magical evening you'll never forget!</div>
+            <div class="gif-container mb-6"><img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExODcydmczNjRvcWdpc3N2YmFhOHZmenZ3cGNwOXZyOWRsdzRjamc5YSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/XvZ8PJ4DSqzSM/giphy.gif" alt="Romantic Date" class="w-full rounded-lg"></div>
+        </div>
+        <div class="grid grid-cols-4 gap-4 mb-8">
+            <div class="bg-pink-100 p-3 rounded-lg"><div id="days" class="text-3xl font-bold countdown-number text-pink-700">00</div><div class="text-sm text-gray-600">Days</div></div>
+            <div class="bg-pink-100 p-3 rounded-lg"><div id="hours" class="text-3xl font-bold countdown-number text-pink-700">00</div><div class="text-sm text-gray-600">Hours</div></div>
+            <div class="bg-pink-100 p-3 rounded-lg"><div id="minutes" class="text-3xl font-bold countdown-number text-pink-700">00</div><div class="text-sm text-gray-600">Minutes</div></div>
+            <div class="bg-pink-100 p-3 rounded-lg"><div id="seconds" class="text-3xl font-bold countdown-number text-pink-700">00</div><div class="text-sm text-gray-600">Seconds</div></div>
+        </div>
+        <div class="bg-pink-50 p-4 rounded-lg mb-6">
+            <h2 class="font-semibold text-pink-700 mb-2">Date Details</h2>
+            <p class="text-gray-600">February 14th, 7:00 PM</p>
+            <p class="text-gray-600">Dress code: Elegant</p>
+            <p class="text-gray-600">Location revealed at 6:00 PM</p>
+        </div>
+        <div class="flex justify-center space-x-4">
+            <button onclick="kissAnimation()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition duration-300 transform hover:scale-105 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" /></svg>
+                Send a Kiss
+            </button>
+            <button onclick="showFinalStep()" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-full transition duration-300 transform hover:scale-105 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                One Last Surprise
+            </button>
+        </div>
+    </div>
+
+    <!-- Final Step with Music -->
+    <div id="finalStep" class="max-w-md w-full bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 text-center hidden z-10 relative"> <!-- Slightly transparent -->
+         <div class="floating mb-6">
+            <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbzA4eHFlYThlemo0OHowYWZvZ3ZuMHg4OHlmbWIwNW44cXBnYjJndyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/4N1wOi78ZGzSB6H7vK/giphy.gif" alt="Floating hearts" class="h-24 w-24 mx-auto rounded-full">
+        </div>
+        <h1 class="text-3xl font-bold text-pink-600 mb-4">Our Song</h1>
+        <div class="mb-6">
+            <p class="text-gray-600 mb-4">This song reminds <span id="songSenderName"></span> of you...</p>
+            <div class="bg-pink-100 p-4 rounded-lg">
+                <p class="font-semibold text-pink-700 mb-2">Perfect by Ed Sheeran</p>
+                <!-- Audio element without default controls -->
+                <audio id="valentineSong" preload="metadata"> <!-- preload helps get duration faster -->
+                    <source src="assets/perfect.mp3" type="audio/mpeg"> <!-- Make sure you have this asset -->
+                    Your browser does not support the audio element.
+                </audio>
+                <!-- Custom Controls -->
+                <div class="custom-audio-controls">
+                    <button id="playPauseBtn" class="play-pause-btn" aria-label="Play Song">
+                        <!-- Play Icon -->
+                        <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                          <path fill-rule="evenodd" d="M2 10a8 8 0 1116 0 8 8 0 01-16 0zm6.39-2.908a.75.75 0 01.766.027l3.5 2.25a.75.75 0 010 1.262l-3.5 2.25A.75.75 0 018 12.25v-4.5a.75.75 0 01.39-.658z" clip-rule="evenodd" />
+                        </svg>
+                        <!-- Pause Icon (hidden initially) -->
+                        <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 hidden">
+                          <path fill-rule="evenodd" d="M2 10a8 8 0 1116 0 8 8 0 01-16 0zM7 8a1 1 0 011-1h4a1 1 0 110 2H8a1 1 0 01-1-1zm1 4a1 1 0 100 2h4a1 1 0 100-2H8z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="progressBarContainer" class="progress-bar-container">
+                        <div id="progressBar" class="progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="gif-container mb-6">
+            <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXIwMHF6YzZjNW1tczhoMTIwbGY1MTdlYWc1ZnB4dG5ranA3bmFoZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/VwrVw4Pty2RP70tvy5/giphy.gif" alt="Dancing Couple" class="w-full rounded-lg">
+        </div>
+        <!-- Button is now hidden as confetti/song play automatically -->
+        <div class="mb-6">
+            <button onclick="showConfetti()" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 flex items-center mx-auto hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" /></svg>
+                Celebrate Our Love!
+            </button>
+        </div>
+        <div id="confettiContainer" class="hidden absolute inset-0 pointer-events-none overflow-hidden z-0"></div>
+    </div>
+
+    <!-- Kiss Animation Overlay -->
+    <div id="kissOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+         <div class="bg-white p-8 rounded-lg max-w-sm text-center">
+            <div class="kiss-animation mb-4">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-pink-600 mb-4">Mwah! 💋</h2>
+            <p class="text-gray-600 mb-4">You sent a kiss to <span id="kissRecipientName"></span>!</p>
+            <button onclick="closeKissAnimation()" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-full transition duration-300">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- Cute Popup Template -->
+    <div id="popupOverlay" class="popup-overlay hidden z-[999]"></div>
+    <div id="cutePopup" class="cute-popup hidden z-[1000]">
+         <button onclick="closePopup()" class="popup-close">×</button>
+        <div class="popup-content">
+            <img id="popupGif" src="" alt="Reaction GIF" class="popup-gif">
+            <p id="popupMessage" class="text-pink-600 font-medium"></p>
+        </div>
+    </div>
+
+<script>
+    // --- Global Variables & Initial Setup ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const senderName = urlParams.get('sender');
+    const recipientName = urlParams.get('recipient');
+    let countdownInterval = null;
+    let splashInterval = null;
+    let balloonInterval = null;
+    let noButtonIsSulking = false; // Flag for "No" button state
+
+    // --- Background Animation Setup ---
+    const balloonContainer = document.getElementById('balloon-container');
+    const splashCardContainer = document.getElementById('splash-card-container');
+    const balloonColors = ['rgba(255, 107, 107, 0.8)', 'rgba(255, 133, 162, 0.8)', 'rgba(255, 174, 180, 0.8)', 'rgba(255, 209, 220, 0.8)', 'rgba(255, 255, 255, 0.7)'];
+    const splashIcons = ['❤️', '💖', '✨', '💕', '💌', '😘'];
+    const splashColors = ['#FF6B6B', '#FF4757', '#E03170', '#FF85A2', '#FFAEC8'];
+
+    function createBalloon() {
+        if (!balloonContainer) return;
+        const balloon = document.createElement('div');
+        balloon.classList.add('balloon');
+        const size = Math.random() * 40 + 40;
+        balloon.style.width = `${size}px`;
+        balloon.style.height = `${size * 1.25}px`;
+        balloon.style.left = `${Math.random() * 95}vw`;
+        balloon.style.backgroundColor = balloonColors[Math.floor(Math.random() * balloonColors.length)];
+        const duration = Math.random() * 10 + 10; // 10-20s
+        const delay = Math.random() * 5;
+        balloon.style.animationDuration = `${duration}s`;
+        balloon.style.animationDelay = `${delay}s`;
+        balloonContainer.appendChild(balloon);
+        setTimeout(() => balloon.remove(), (duration + delay + 1) * 1000);
+    }
+
+    function createSplashCard() {
+        if (!splashCardContainer) return;
+        const card = document.createElement('div');
+        card.classList.add('splash-card');
+        card.textContent = splashIcons[Math.floor(Math.random() * splashIcons.length)];
+        card.style.color = splashColors[Math.floor(Math.random() * splashColors.length)];
+        card.style.left = `${Math.random() * 90 + 5}vw`;
+        card.style.top = `${Math.random() * 85 + 10}vh`;
+        splashCardContainer.appendChild(card);
+        setTimeout(() => card.remove(), 1000);
+    }
+
+    function startBackgroundAnimations() {
+        if (balloonInterval) clearInterval(balloonInterval);
+        if (splashInterval) clearInterval(splashInterval);
+        if (balloonContainer && splashCardContainer) {
+            balloonContainer.innerHTML = ''; // Clear old ones first
+            splashCardContainer.innerHTML = '';
+            for (let i = 0; i < 15; i++) createBalloon();
+            balloonInterval = setInterval(createBalloon, 3500);
+            splashInterval = setInterval(createSplashCard, 700);
+        }
+    }
+    // --- End Background Animation ---
+
+    // --- Initialize ---
+    if (senderName && recipientName) {
+        showStep('step1');
+        setNames(senderName, recipientName);
+        startBackgroundAnimations();
+    } else {
+        showStep('nameInputStep');
+    }
+
+    // --- Utility Functions ---
+    function setNames(sender, recipient) {
+        const elementsToSet = {
+            'proposalSenderName': sender, 'recipientNameDisplay': recipient,
+            'senderNameDisplay': sender, 'letterRecipientName': recipient,
+            'letterContentRecipientName': recipient, 'letterSenderName': sender,
+            'dateSenderName': sender, 'songSenderName': sender,
+            'kissRecipientName': sender, 'displayRecipientName': recipient,
+        };
+        for (const id in elementsToSet) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = elementsToSet[id];
+        }
+    }
+
+    function showPopup(gifUrl, message) {
+        const popupGif = document.getElementById('popupGif');
+        const popupMessage = document.getElementById('popupMessage');
+        const popupOverlay = document.getElementById('popupOverlay');
+        const cutePopup = document.getElementById('cutePopup');
+        if (popupGif) popupGif.src = gifUrl;
+        if (popupMessage) popupMessage.textContent = message;
+        if (popupOverlay) popupOverlay.classList.remove('hidden');
+        if (cutePopup) cutePopup.classList.remove('hidden');
+    }
+
+    function closePopup() {
+        document.getElementById('popupOverlay')?.classList.add('hidden');
+        document.getElementById('cutePopup')?.classList.add('hidden');
+    }
+
+    // --- Step Navigation & Actions ---
+    function showStep(stepToShow) {
+        const steps = ['step1', 'step2', 'step3', 'step4', 'step5', 'finalStep', 'nameInputStep', 'linkStep'];
+        steps.forEach(stepId => document.getElementById(stepId)?.classList.add('hidden'));
+        const targetStep = document.getElementById(stepToShow);
+        if (targetStep) {
+            targetStep.classList.remove('hidden');
+            // Add fade-in animation (optional, requires animate.css)
+            targetStep.classList.add('animate__animated', 'animate__fadeIn');
+            targetStep.addEventListener('animationend', () => {
+                targetStep.classList.remove('animate__animated', 'animate__fadeIn');
+            }, { once: true });
+        } else {
+            console.error("Step not found:", stepToShow);
+        }
+    }
+
+    function generateProposalLink() {
+        const sender = document.getElementById('senderName')?.value.trim();
+        const recipient = document.getElementById('recipientName')?.value.trim();
+        if (!sender || !recipient) {
+            showPopup('https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExaTF5ZHdpazdrZGozMmt6eDlnZWtmeDR2MTF2bG1wcDJzaWNlcjVudCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/WxBAB110jrDQ5njMaK/giphy.gif', 'Please enter both names!');
+            return;
+        }
+        const currentUrl = window.location.href.split('?')[0];
+        const proposalUrl = `${currentUrl}?sender=${encodeURIComponent(sender)}&recipient=${encodeURIComponent(recipient)}`;
+        showStep('linkStep');
+        startBackgroundAnimations();
+        const recipientDisplay = document.getElementById('displayRecipientName');
+        if (recipientDisplay) recipientDisplay.textContent = recipient;
+        const proposalLinkInput = document.getElementById('proposalLink');
+        if (proposalLinkInput) proposalLinkInput.value = proposalUrl;
+    }
+
+    // --- Clipboard and Sharing ---
+    function copyLink() {
+        const linkInput = document.getElementById('proposalLink'); if (!linkInput) return;
+        linkInput.select(); if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(linkInput.value).then(showCopiedFeedback).catch(err => { console.error('Clipboard API copy failed:', err); fallbackCopy(linkInput); }); } else { fallbackCopy(linkInput); }
+    }
+    function fallbackCopy(inputElement) { try { inputElement.select(); document.execCommand('copy'); showCopiedFeedback(); } catch (e) { console.error('execCommand copy failed:', e); alert('Failed to copy link.'); } }
+    function showCopiedFeedback() { const copyBtn = document.querySelector('.copy-btn'); if(copyBtn) { copyBtn.classList.add('copied'); setTimeout(() => { copyBtn.classList.remove('copied'); }, 2000); } showPopup('https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExa2ZpOWYwY2c0OTllb21tdms4bzlpaGRuYnJrMzhyaThseXc5NXk4ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/AEBiddfFfldfCDRbwY/giphy.gif', 'Link copied! Ready to share!'); }
+    function shareOnWhatsApp() { const link = document.getElementById('proposalLink')?.value; const recipient = document.getElementById('displayRecipientName')?.textContent || "my Valentine"; if(link) window.open(`https://wa.me/?text=Hey ${recipient}, will you be my Valentine? ❤️ Check this out: ${encodeURIComponent(link)}`); }
+    function shareOnFacebook() { const link = document.getElementById('proposalLink')?.value; if(link) window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}"e=Will you be my Valentine?`); }
+    function shareOnTwitter() { const link = document.getElementById('proposalLink')?.value; const recipient = document.getElementById('displayRecipientName')?.textContent || "Valentine"; if(link) window.open(`https://twitter.com/intent/tweet?text=Hey @${recipient}, will you be my Valentine? ❤️&url=${encodeURIComponent(link)}`); }
+
+    function startProposal() {
+        const sender = urlParams.get('sender') || document.getElementById('senderName')?.value.trim();
+        const recipient = urlParams.get('recipient') || document.getElementById('recipientName')?.value.trim();
+        if (!sender || !recipient) {
+            showPopup('https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExaTF5ZHdpazdrZGozMmt6eDlnZWtmeDR2MTF2bG1wcDJzaWNlcjVudCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/WxBAB110jrDQ5njMaK/giphy.gif', 'Oops! Names are missing.');
+            showStep('nameInputStep');
+            return;
+        }
+        showStep('step1');
+        setNames(sender, recipient);
+        startBackgroundAnimations();
+    }
+
+    function showStep2() { showStep('step2'); }
+    function showStep3() { showStep('step3'); }
+
+    function openLetter() {
+        const envelope = document.querySelector('.envelope');
+        const letterContent = document.getElementById('letterContent');
+        if (envelope) envelope.style.display = 'none';
+        if (letterContent) {
+            letterContent.classList.remove('hidden');
+            letterContent.classList.add('animate__animated', 'animate__fadeInUp');
+            letterContent.addEventListener('animationend', () => {
+                letterContent.classList.remove('animate__animated', 'animate__fadeInUp');
+            }, { once: true });
+        }
+    }
+
+    function showStep4() {
+        showStep('step4');
+        const loveMeter = document.getElementById('loveMeter');
+        const loveMeterText = document.getElementById('loveMeterText'); // Get the text element
+
+        if (loveMeter && loveMeterText) {
+            loveMeter.style.transition = 'none'; // Disable transition for reset
+            loveMeterText.style.transition = 'none';
+            loveMeter.style.width = '0%'; // Reset width
+            loveMeterText.style.opacity = '0'; // Reset text opacity
+            loveMeterText.textContent = ''; // Clear text initially
+
+            // Force reflow/repaint before re-enabling transitions
+            void loveMeter.offsetWidth; // Reading offsetHeight forces reflow
+            void loveMeterText.offsetWidth;
+
+            loveMeter.style.transition = 'width 0.8s ease-in-out'; // Re-enable transitions
+            loveMeterText.style.transition = 'opacity 0.5s ease 0.7s'; // Delay matches text fade-in
+
+            // Start animation
+            requestAnimationFrame(() => { // Use rAF for smoother start
+                loveMeter.style.width = '100%'; // Start the bar animation
+                // Update text and fade it in *after* the bar animation starts
+                setTimeout(() => {
+                    loveMeterText.textContent = '100%';
+                    loveMeterText.style.opacity = '1';
+                }, 700); // Corresponds to the 0.7s delay in CSS for opacity
+            });
+        }
+    }
+
+
+    function showStep5() {
+        showStep('step5');
+        startCountdown();
+    }
+
+    // --- Updated function ---
+    function showFinalStep() {
+        showStep('finalStep');
+        initializeCustomAudioPlayer(); // Make sure audio player is ready
+
+        // Automatically trigger confetti and song after a short delay
+        setTimeout(() => {
+            showConfetti(); // This function now also handles playing the song
+        }, 100); // Small delay to allow step rendering
+    }
+    // --------------------
+
+    function kissAnimation() {
+        document.getElementById('kissOverlay')?.classList.remove('hidden');
+        try {
+            const kissSound = new Audio('assets/02k.mp3');
+            if (kissSound.canPlayType('audio/mpeg')) {
+                 kissSound.play().catch(e => console.warn("Kiss sound playback prevented:", e));
+            }
+        } catch (error) {
+            console.error("Error loading kiss sound:", error);
+        }
+        setTimeout(closeKissAnimation, 2500);
+    }
+
+    function closeKissAnimation() {
+        document.getElementById('kissOverlay')?.classList.add('hidden');
+    }
+
+    // --- Confetti ---
+    function showConfetti() {
+        const container = document.getElementById('confettiContainer'); if (!container) return; container.classList.remove('hidden'); container.innerHTML = ''; const fragment = document.createDocumentFragment(); for (let i = 0; i < 120; i++) { const confetti = document.createElement('div'); confetti.style.position='absolute'; confetti.style.width=`${Math.random()*10+5}px`; confetti.style.height=`${Math.random()*10+5}px`; confetti.style.backgroundColor=getRandomColor(); confetti.style.borderRadius=`${Math.random()>0.4?'50%':'0'}`; confetti.style.left=`${Math.random()*100}%`; confetti.style.top=`${-Math.random()*30-10}px`; confetti.style.opacity='1'; const angle=Math.random()*360, fallDuration=4000+Math.random()*4000, sway=Math.random()*250-125; fragment.appendChild(confetti); const animation=confetti.animate([{transform:`translateY(0px) translateX(0px) rotate(${angle}deg)`,opacity:1},{transform:`translateY(${window.innerHeight+50}px) translateX(${sway}px) rotate(${angle+Math.random()*720}deg)`,opacity:0}],{duration:fallDuration,easing:'cubic-bezier(0.25,0.1,0.25,1.0)'}); animation.finished.then(()=>confetti.remove()); } container.appendChild(fragment);
+        // Attempt to play the song when confetti starts
+        document.getElementById('valentineSong')?.play().catch(e=>console.log("Song autoplay prevented by browser.", e));
+        setTimeout(()=>{showPopup('https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExamh1b2Y4bDN1eDQ2eGg2YmNlMGxsM3dsOGJxanhkM2xvMjdhdXhwaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/eNGfBpXSy81LosTbi4/giphy.gif',"Happy Valentine's Day, my love! ❤️");},1500); setTimeout(()=>{if(container)container.classList.add('hidden');},8000);
+    }
+    function getRandomColor() { const colors = ['#FF6B6B', '#FF4757', '#E03170', '#FF85A2', '#FFAEC8', '#FFFFFF', '#FFD1DC']; return colors[Math.floor(Math.random() * colors.length)]; }
+
+    // --- Countdown Timer ---
+    function startCountdown(){if(countdownInterval)clearInterval(countdownInterval);const cy=new Date().getFullYear();let ty=cy;const nc=new Date().getTime();const vt=new Date(`Feb 14, ${cy} 19:00:00`).getTime();if(nc>vt){ty=cy+1;}const cd=new Date(`Feb 14, ${ty} 19:00:00`).getTime();const ut=()=>{const n=new Date().getTime();const d=cd-n;const de=document.getElementById("days");const he=document.getElementById("hours");const me=document.getElementById("minutes");const se=document.getElementById("seconds");if(!de||!he||!me||!se){clearInterval(countdownInterval);return;}if(d<0){clearInterval(countdownInterval);countdownInterval=null;de.innerHTML="00";he.innerHTML="00";me.innerHTML="00";se.innerHTML="00";const tw=document.querySelector('#step5 .typewriter');if(tw){tw.style.animation='none';tw.textContent="It's time for our date! ❤️";tw.style.borderRight='none';}return;}const ds=Math.floor(d/(1000*60*60*24));const hs=Math.floor((d%(1000*60*60*24))/(1000*60*60));const ms=Math.floor((d%(1000*60*60))/(1000*60));const ss=Math.floor((d%(1000*60))/1000);const ft=(t)=>t<10?`0${t}`:t;de.innerHTML=ft(ds);he.innerHTML=ft(hs);me.innerHTML=ft(ms);se.innerHTML=ft(ss);};ut();countdownInterval=setInterval(ut,1000);}
+
+    // --- "No" Button Logic (Corrected) ---
+    const noButton = document.getElementById('noButton');
+    let noButtonScale = 1;
+    let noButtonMoveCount = 0;
+    let noButtonTimeout;
+
+    if (noButton) {
+        noButton.style.position = 'relative'; // Start as relative
+
+        noButton.addEventListener('mouseover', function() {
+            if (noButtonIsSulking) { return; }
+            clearTimeout(noButtonTimeout);
+            noButtonMoveCount++;
+
+            if (noButtonMoveCount >= 7) { // Threshold
+                noButtonIsSulking = true;
+                if (this.style.position !== 'fixed') {
+                     this.style.position = 'relative';
+                     this.style.left = 'auto'; this.style.top = 'auto';
+                }
+                 this.style.opacity = '1'; this.style.pointerEvents = 'auto';
+
+                noButtonTimeout = setTimeout(() => {
+                    showPopup('https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMDFsN3k4MmQ5NmVvMDZrcmkzdjEwbWRoaTIyNmxvMmh1eGk1bnV5OCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/BEob5qwFkSJ7G/giphy.gif', "Please say yes! I'll be so sad if you don't!");
+                    resetNoButton();
+                }, 300);
+
+            } else { // Normal Movement
+                const vpW = window.innerWidth, vpH = window.innerHeight;
+                const btnW = this.offsetWidth, btnH = this.offsetHeight;
+                const maxX = vpW - btnW - 20, maxY = vpH - btnH - 20;
+                const minX = 10, minY = 10;
+                let newX = Math.max(minX, Math.min(maxX, Math.random() * vpW));
+                let newY = Math.max(minY, Math.min(maxY, Math.random() * vpH));
+                this.style.position = 'fixed';
+                this.style.left = `${newX}px`; this.style.top = `${newY}px`;
+                this.style.zIndex = '50';
+                noButtonScale *= 0.92;
+                this.style.transform = `scale(${noButtonScale})`;
+            }
+        });
+
+        noButton.addEventListener('mouseleave', function() {
+            if (noButtonIsSulking) { return; }
+            clearTimeout(noButtonTimeout);
+            noButtonTimeout = setTimeout(resetNoButtonPosition, 1000);
+        });
+    }
+
+    function resetNoButtonPosition() {
+        if (noButton && noButton.style.position === 'fixed' && !noButtonIsSulking) {
+            noButton.style.position = 'relative';
+            noButton.style.left = 'auto'; noButton.style.top = 'auto';
+            noButton.style.zIndex = 'auto';
+        }
+    }
+
+    function resetNoButton() {
+        if (!noButton) return;
+        noButtonScale = 1; noButtonMoveCount = 0; noButtonIsSulking = false;
+        noButton.style.opacity = '1'; noButton.style.transform = 'scale(1)';
+        noButton.style.pointerEvents = 'auto';
+        resetNoButtonPosition();
+        clearTimeout(noButtonTimeout);
+    }
+    // --- End "No" Button Logic ---
+
+    // --- Custom Audio Player Logic ---
+    function initializeCustomAudioPlayer(){const a=document.getElementById('valentineSong');const pb=document.getElementById('playPauseBtn');const pi=document.getElementById('playIcon');const pa=document.getElementById('pauseIcon');const pr=document.getElementById('progressBar');const pc=document.getElementById('progressBarContainer');if(!a||!pb||!pi||!pa||!pr||!pc){console.warn("Custom audio elements missing.");return;}pb.onclick=null;a.onplay=null;a.onpause=null;a.onended=null;a.ontimeupdate=null;pc.onclick=null;pb.onclick=()=>{if(a.paused||a.ended){a.play().catch(e=>console.error("Audio play failed:",e));}else{a.pause();}};const ui=()=>{if(a.paused||a.ended){pi?.classList.remove('hidden');pa?.classList.add('hidden');pb?.setAttribute('aria-label','Play Song');}else{pi?.classList.add('hidden');pa?.classList.remove('hidden');pb?.setAttribute('aria-label','Pause Song');}};a.onplay=ui;a.onpause=ui;a.onended=()=>{ui();if(pr)pr.style.width='0%';};a.ontimeupdate=()=>{if(a.duration&&pr){const p=(a.currentTime/a.duration)*100;pr.style.width=`${p}%`;}};pc.onclick=(e)=>{if(a.duration){const r=pc.getBoundingClientRect();const cl=e.clientX-r.left;const p=Math.max(0,Math.min(1,cl/r.width));a.currentTime=a.duration*p;}};ui();}
+    // --- End Custom Audio Player ---
+
+    // --- Reaction Popups ---
+    function showReaction(t){let g,m;switch(t){case'blush':g='https://media.tenor.com/7HwzU8Qb3eEAAAAi/hearts-love.gif';m="Aww, you're blushing! So sweet!";break;case'excited':g='https://media.tenor.com/1bqP1wKkzJ8AAAAi/excited-happy.gif';m="Yay! You seem excited! 😊";break;case'nervous':g='https://media.tenor.com/5L0xdq_KpM4AAAAi/nervous-sweating.gif';m="A little nervous? It's okay! ❤️";break;default:g='https://media.tenor.com/7HwzU8Qb3eEAAAAi/hearts-love.gif';m="Thanks for reacting!";}showPopup(g,m);}
+
+</script>
+</body>
+</html>
